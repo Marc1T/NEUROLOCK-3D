@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>NEUROLOCK — Survive. Learn. Repeat.</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+
+<!-- ================== HOME ================== -->
+<section id="screen-home" class="screen active">
+  <canvas id="home-canvas-bg"></canvas>
+  <div class="home-bg"></div>
+  <div class="home-container">
+    <h1 class="logo">
+      <span class="logo-neuro">NEURO</span><span class="logo-lock">LOCK</span>
+    </h1>
+    <p class="tagline">Survive. Learn. Repeat.</p>
+    <div class="home-actions">
+      <button class="btn btn-primary btn-big" data-nav="course-select">▶ Jouer</button>
+      <button class="btn" data-nav="teacher">👩‍🏫 Mode enseignant</button>
+      <button class="btn" data-nav="settings">⚙ Paramètres</button>
+    </div>
+    <div class="home-stats" id="home-stats"></div>
+    <div class="recent-runs" id="recent-runs"></div>
+    <p class="home-footer">v1.0 — top-down survival quiz</p>
+  </div>
+</section>
+
+<!-- ================== COURSE SELECT ================== -->
+<section id="screen-course-select" class="screen">
+  <header class="screen-header">
+    <button class="btn-back" data-nav="home">←</button>
+    <h2>Choisir un cours</h2>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="predef">Prédéfinis</button>
+    <button class="tab" data-tab="import">Importer</button>
+    <button class="tab" data-tab="custom">Mes cours</button>
+    <button class="tab" data-tab="session">Code session</button>
+  </div>
+
+  <div class="tab-panels">
+    <div class="tab-panel active" data-panel="predef">
+      <div id="predef-list" class="course-grid"></div>
+    </div>
+
+    <div class="tab-panel" data-panel="import">
+      <h3>Importer un cours</h3>
+      <div class="import-grid">
+        <div class="import-card">
+          <h4>📄 PDF</h4>
+          <input type="file" id="import-pdf" accept="application/pdf" />
+        </div>
+        <div class="import-card">
+          <h4>✍ Texte</h4>
+          <textarea id="import-text" rows="8" placeholder="Colle ici un cours, une définition, des notes…"></textarea>
+        </div>
+        <div class="import-card">
+          <h4>🌐 URL</h4>
+          <input type="url" id="import-url" placeholder="https://fr.wikipedia.org/wiki/..." />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label>Matière <input type="text" id="import-subject" placeholder="Ex: Histoire WW2" /></label>
+        <label>Difficulté
+          <select id="import-difficulty">
+            <option value="1">Facile</option>
+            <option value="2" selected>Moyen</option>
+            <option value="3">Difficile</option>
+          </select>
+        </label>
+        <label>Questions
+          <input type="number" id="import-count" value="15" min="5" max="30" />
+        </label>
+      </div>
+
+      <div class="form-row">
+        <button class="btn btn-primary" id="btn-generate">⚡ Générer avec l'IA</button>
+        <button class="btn" id="btn-generate-demo">🧪 Mode démo (sans API)</button>
+      </div>
+
+      <div id="generate-status" class="status-msg hidden"></div>
+    </div>
+
+    <div class="tab-panel" data-panel="custom">
+      <h3>Mes cours sauvegardés</h3>
+      <div id="custom-list" class="course-grid"></div>
+    </div>
+
+    <div class="tab-panel" data-panel="session">
+      <h3>Code session enseignant</h3>
+      <p class="muted">Entre le code à 6 chiffres fourni par ton enseignant.</p>
+      <div class="form-row">
+        <input type="text" id="session-code" maxlength="6" placeholder="------" class="code-input" />
+        <button class="btn btn-primary" id="btn-session-load">Charger</button>
+      </div>
+      <p class="muted">Ou colle le pack JSON exporté :</p>
+      <textarea id="session-paste" rows="5" placeholder='{"id":"sess_...", "questions":[...]}'></textarea>
+      <button class="btn" id="btn-session-paste-load">Charger depuis le presse-papier</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================== PREVIEW ================== -->
+<section id="screen-preview" class="screen">
+  <header class="screen-header">
+    <button class="btn-back" data-nav="course-select">←</button>
+    <h2>Aperçu : <span id="preview-subject"></span></h2>
+  </header>
+
+  <div class="preview-stats" id="preview-stats"></div>
+  <div class="preview-questions" id="preview-questions"></div>
+
+  <div class="form-row">
+    <button class="btn" id="btn-preview-save">💾 Sauvegarder</button>
+    <button class="btn btn-primary btn-big" id="btn-preview-play">▶ Lancer un run</button>
+  </div>
+</section>
+
+<!-- ================== CONFIG RUN ================== -->
+<section id="screen-config" class="screen">
+  <header class="screen-header">
+    <button class="btn-back" data-nav="preview">←</button>
+    <h2>Configurer le run</h2>
+  </header>
+  <div class="config-form">
+    <label>Durée initiale (s)
+      <input type="number" id="cfg-timer" value="240" min="30" max="900" />
+    </label>
+    <label>Questions par run
+      <input type="number" id="cfg-questions" value="15" min="3" max="50" />
+    </label>
+    <label>Difficulté de départ
+      <select id="cfg-difficulty">
+        <option value="1">Détente</option>
+        <option value="2" selected>Standard</option>
+        <option value="3">Hardcore</option>
+      </select>
+    </label>
+    <label>
+      <input type="checkbox" id="cfg-adaptive" checked /> IA adaptative
+    </label>
+  </div>
+  <button class="btn btn-primary btn-big" id="btn-config-start">▶ Démarrer</button>
+</section>
+
+<!-- ================== GAME ================== -->
+<section id="screen-game" class="screen">
+  <div id="hud">
+    <div class="hud-left">
+      <div id="hud-hp" class="hud-hp"></div>
+      <div class="hud-score">Score: <span id="hud-score">0</span></div>
+    </div>
+    <div class="hud-center">
+      <div class="hud-subject" id="hud-subject"></div>
+      <div class="hud-timer" id="hud-timer">02:00</div>
+    </div>
+    <div class="hud-right">
+      <div class="hud-accuracy">
+        <span id="hud-accuracy">--%</span>
+        <div class="bar"><div class="bar-fill" id="hud-accuracy-bar"></div></div>
+      </div>
+      <button class="btn-icon" id="btn-pause" title="Pause">⏸</button>
+    </div>
+  </div>
+
+  <canvas id="game-canvas"></canvas>
+
+  <!-- Minimap -->
+  <canvas id="minimap" width="160" height="160"></canvas>
+
+  <!-- Wave countdown -->
+  <div id="wave-info">
+    <span class="wave-label">Vague</span>
+    <span id="wave-number">0</span>
+    <span class="wave-sep">·</span>
+    <span id="wave-countdown">--</span>
+  </div>
+
+  <!-- Combo display -->
+  <div id="combo-display" class="hidden">
+    <div class="combo-label">COMBO</div>
+    <div id="combo-value">0</div>
+    <div id="combo-mult">×1.0</div>
+  </div>
+
+  <!-- Help overlay (first start) -->
+  <div id="help-overlay" class="hidden">
+    <div class="help-box">
+      <h2>Comment jouer</h2>
+      <div class="help-grid">
+        <div><kbd>WASD</kbd> / <kbd>ZQSD</kbd> / <kbd>↑↓←→</kbd><br><span>Se déplacer</span></div>
+        <div><kbd>E</kbd> / <kbd>Espace</kbd><br><span>Poser une tour ✛ ou ouvrir une porte 🔒</span></div>
+        <div><kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> <kbd>D</kbd><br><span>Répondre au quiz</span></div>
+        <div><kbd>Échap</kbd><br><span>Pause / Passer une question</span></div>
+      </div>
+      <div class="help-objective">
+        <strong>Objectif :</strong> atteindre la sortie verte avant que le timer atteigne zéro.
+        Réponds correctement aux quiz pour gagner du temps et déverrouiller des portes.
+      </div>
+      <button class="btn btn-primary" id="btn-help-close">Compris, je joue !</button>
+    </div>
+  </div>
+
+  <!-- Mobile controls -->
+  <div id="mobile-controls">
+    <div class="dpad">
+      <button data-dir="up">▲</button>
+      <div class="dpad-row">
+        <button data-dir="left">◀</button>
+        <button data-dir="action">⬢</button>
+        <button data-dir="right">▶</button>
+      </div>
+      <button data-dir="down">▼</button>
+    </div>
+  </div>
+
+  <!-- Wave / event banner -->
+  <div id="event-banner" class="hidden"></div>
+
+  <!-- Pause overlay -->
+  <div id="pause-overlay" class="hidden">
+    <div class="pause-box">
+      <h2>Pause</h2>
+      <button class="btn btn-primary" id="btn-resume">▶ Reprendre</button>
+      <button class="btn" id="btn-abandon">Abandonner</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================== QUIZ OVERLAY ================== -->
+<section id="screen-quiz" class="screen-overlay hidden">
+  <div class="quiz-box">
+    <div class="quiz-header">
+      <span class="quiz-trigger" id="quiz-trigger">Porte verrouillée</span>
+      <div class="quiz-timer">
+        <div class="quiz-timer-bar" id="quiz-timer-bar"></div>
+        <span id="quiz-timer-text">8s</span>
+      </div>
+    </div>
+    <div class="quiz-question" id="quiz-question"></div>
+    <div class="quiz-choices" id="quiz-choices"></div>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-actions">
+      <button class="btn btn-ghost" id="btn-quiz-skip">Passer (−8s)</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================== RESULTS ================== -->
+<section id="screen-results" class="screen">
+  <div class="results-box">
+    <h1 id="results-title">RUN TERMINÉ</h1>
+    <div class="results-grid" id="results-grid"></div>
+    <h3>Notions à retravailler</h3>
+    <ul id="results-review"></ul>
+    <h3>Badges débloqués</h3>
+    <div id="results-badges" class="badge-row"></div>
+    <div class="form-row">
+      <button class="btn btn-primary" id="btn-replay">↻ Rejouer</button>
+      <button class="btn" data-nav="course-select">Changer de cours</button>
+      <button class="btn" data-nav="home">Accueil</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================== SETTINGS ================== -->
+<section id="screen-settings" class="screen">
+  <header class="screen-header">
+    <button class="btn-back" data-nav="home">←</button>
+    <h2>Paramètres</h2>
+  </header>
+
+  <div class="settings-form">
+    <h3>Joueur</h3>
+    <label>Nom du joueur
+      <input type="text" id="set-name" placeholder="Anonyme" />
+    </label>
+
+    <h3>Fournisseur d'IA</h3>
+    <label>Fournisseur actif
+      <select id="set-provider"></select>
+    </label>
+
+    <div id="provider-keys"></div>
+
+    <h3>Audio</h3>
+    <label>Volume
+      <input type="range" id="set-volume" min="0" max="100" value="60" />
+    </label>
+    <label>
+      <input type="checkbox" id="set-audio-enabled" checked /> Sons activés
+    </label>
+
+    <h3>Données</h3>
+    <button class="btn" id="btn-export-save">📤 Exporter sauvegarde</button>
+    <button class="btn btn-danger" id="btn-reset-save">🗑 Effacer tout</button>
+
+    <button class="btn btn-primary" id="btn-settings-save">💾 Enregistrer</button>
+    <div id="settings-msg" class="status-msg hidden"></div>
+  </div>
+</section>
+
+<!-- ================== TEACHER ================== -->
+<section id="screen-teacher" class="screen">
+  <header class="screen-header">
+    <button class="btn-back" data-nav="home">←</button>
+    <h2>Mode enseignant</h2>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="t-create">Créer une session</button>
+    <button class="tab" data-tab="t-stats">Tableau de bord</button>
+  </div>
+
+  <div class="tab-panels">
+    <div class="tab-panel active" data-panel="t-create">
+      <h3>Nouvelle session</h3>
+      <p class="muted">Importe un cours et génère un code à partager avec ta classe.</p>
+      <div class="form-row">
+        <label>Matière <input type="text" id="t-subject" placeholder="Ex: Algèbre 1ère" /></label>
+        <label>Difficulté
+          <select id="t-difficulty">
+            <option value="1">Facile</option>
+            <option value="2" selected>Moyen</option>
+            <option value="3">Difficile</option>
+          </select>
+        </label>
+        <label>Questions <input type="number" id="t-count" value="20" min="5" max="50" /></label>
+      </div>
+      <textarea id="t-text" rows="10" placeholder="Colle le cours ici…"></textarea>
+      <div class="form-row">
+        <button class="btn btn-primary" id="btn-t-generate">⚡ Générer + créer session</button>
+        <button class="btn" id="btn-t-export">📤 Exporter pack JSON</button>
+      </div>
+      <div id="t-result" class="session-result hidden">
+        <p>Code session : <strong id="t-code"></strong></p>
+        <p class="muted">Les élèves peuvent entrer ce code dans "Choisir un cours → Code session".</p>
+      </div>
+    </div>
+
+    <div class="tab-panel" data-panel="t-stats">
+      <h3>Statistiques de classe</h3>
+      <div id="t-stats-content">
+        <p class="muted">Les élèves doivent envoyer leur fichier de résultats (export depuis l'écran fin de run) pour alimenter le tableau de bord.</p>
+        <input type="file" id="t-stats-import" accept="application/json" multiple />
+        <button class="btn" id="btn-t-export-csv">📥 Exporter CSV</button>
+        <div id="t-stats-table"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================== TOAST ================== -->
+<div id="toast" class="hidden"></div>
+
+<!-- ================== LOADING OVERLAY ================== -->
+<div id="loading-overlay" class="hidden">
+  <div class="loading-box">
+    <div class="spinner"></div>
+    <div class="loading-msg" id="loading-msg">Génération en cours…</div>
+    <div class="loading-sub" id="loading-sub"></div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="js/storage.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/maze.js"></script>
+<script src="js/renderer.js"></script>
+<script src="js/player.js"></script>
+<script src="js/enemies.js"></script>
+<script src="js/towers.js"></script>
+<script src="js/quiz.js"></script>
+<script src="js/adaptive_ai.js"></script>
+<script src="js/ai_pipeline.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/game.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

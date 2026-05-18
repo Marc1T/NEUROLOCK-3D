@@ -1,0 +1,31 @@
+{
+  "id": "binaire_v1",
+  "subject": "Binaire",
+  "description": "Conversions binaire ↔ décimal, représentation sur N bits, opérations.",
+  "version": "1.0",
+  "author": "NEUROLOCK",
+  "questions": [
+    { "id": "bin_001", "subject": "Binaire", "level": 1, "question": "Que vaut 1010₂ en décimal ?", "choices": ["8", "10", "12", "14"], "correct": 1, "explanation": "1×8 + 0×4 + 1×2 + 0×1 = 10.", "duration": 8, "tags": ["conversion"] },
+    { "id": "bin_002", "subject": "Binaire", "level": 1, "question": "Combien de bits pour représenter 15 ?", "choices": ["2", "3", "4", "8"], "correct": 2, "explanation": "1111₂ = 15, soit 4 bits.", "duration": 8, "tags": ["représentation"] },
+    { "id": "bin_003", "subject": "Binaire", "level": 1, "question": "Que vaut 1111₂ en décimal ?", "choices": ["7", "11", "15", "31"], "correct": 2, "explanation": "8+4+2+1 = 15.", "duration": 8, "tags": ["conversion"] },
+    { "id": "bin_004", "subject": "Binaire", "level": 1, "question": "Représentation binaire de 6 ?", "choices": ["100", "101", "110", "111"], "correct": 2, "explanation": "4+2 = 6 → 110.", "duration": 8, "tags": ["conversion"] },
+    { "id": "bin_005", "subject": "Binaire", "level": 1, "question": "Combien de valeurs distinctes sur 8 bits ?", "choices": ["128", "255", "256", "1024"], "correct": 2, "explanation": "2⁸ = 256 valeurs (0 à 255).", "duration": 8, "tags": ["représentation"] },
+    { "id": "bin_006", "subject": "Binaire", "level": 2, "question": "Que vaut 10110₂ en décimal ?", "choices": ["18", "20", "22", "26"], "correct": 2, "explanation": "16+4+2 = 22.", "duration": 8, "tags": ["conversion"] },
+    { "id": "bin_007", "subject": "Binaire", "level": 2, "question": "Binaire de 25 ?", "choices": ["10011", "11001", "11010", "10101"], "correct": 1, "explanation": "16+8+1 = 25 → 11001.", "duration": 8, "tags": ["conversion"] },
+    { "id": "bin_008", "subject": "Binaire", "level": 2, "question": "1101 + 0110 (binaire) = ?", "choices": ["10001", "10010", "10011", "10100"], "correct": 2, "explanation": "13+6 = 19 = 10011₂.", "duration": 10, "tags": ["addition"] },
+    { "id": "bin_009", "subject": "Binaire", "level": 2, "question": "Binaire de 100 ?", "choices": ["1100100", "1011010", "1100010", "1110100"], "correct": 0, "explanation": "64+32+4 = 100 → 1100100.", "duration": 10, "tags": ["conversion"] },
+    { "id": "bin_010", "subject": "Binaire", "level": 2, "question": "Valeur maximale sur 4 bits non signés ?", "choices": ["7", "8", "15", "16"], "correct": 2, "explanation": "2⁴-1 = 15.", "duration": 8, "tags": ["représentation"] },
+    { "id": "bin_011", "subject": "Binaire", "level": 1, "question": "0₂ + 1₂ = ?", "choices": ["0", "1", "10", "11"], "correct": 1, "explanation": "Addition basique : 0+1 = 1.", "duration": 6, "tags": ["addition"] },
+    { "id": "bin_012", "subject": "Binaire", "level": 2, "question": "1₂ + 1₂ = ?", "choices": ["1", "10", "11", "2"], "correct": 1, "explanation": "1+1 = 10 en binaire (retenue).", "duration": 8, "tags": ["addition"] },
+    { "id": "bin_013", "subject": "Binaire", "level": 3, "question": "Complément à 2 sur 8 bits de -5 ?", "choices": ["11111011", "10000101", "11111010", "00000101"], "correct": 0, "explanation": "5 = 00000101, inverser = 11111010, +1 = 11111011.", "duration": 12, "tags": ["complément-à-2"] },
+    { "id": "bin_014", "subject": "Binaire", "level": 3, "question": "Plage des entiers signés sur 8 bits (complément à 2) ?", "choices": ["-127 à 127", "-128 à 127", "0 à 255", "-256 à 255"], "correct": 1, "explanation": "Signé 8 bits : -128 à +127.", "duration": 10, "tags": ["complément-à-2"] },
+    { "id": "bin_015", "subject": "Binaire", "level": 2, "question": "Décalage à gauche de 0011₂ d'1 bit donne ?", "choices": ["0001", "0110", "0011", "1100"], "correct": 1, "explanation": "Décalage gauche = ×2 → 6 → 0110.", "duration": 10, "tags": ["décalage"] },
+    { "id": "bin_016", "subject": "Binaire", "level": 1, "question": "Un octet contient combien de bits ?", "choices": ["4", "8", "16", "32"], "correct": 1, "explanation": "1 octet = 8 bits.", "duration": 6, "tags": ["définition"] },
+    { "id": "bin_017", "subject": "Binaire", "level": 2, "question": "Binaire de 42 ?", "choices": ["101010", "100110", "110100", "111010"], "correct": 0, "explanation": "32+8+2 = 42 → 101010.", "duration": 10, "tags": ["conversion"] },
+    { "id": "bin_018", "subject": "Binaire", "level": 1, "question": "Décimal de 100₂ ?", "choices": ["2", "4", "8", "100"], "correct": 1, "explanation": "1×4 = 4.", "duration": 6, "tags": ["conversion"] },
+    { "id": "bin_019", "subject": "Binaire", "level": 2, "question": "Combien de bits pour 1000 valeurs distinctes (mini) ?", "choices": ["8", "9", "10", "16"], "correct": 2, "explanation": "2¹⁰ = 1024 ≥ 1000, donc 10 bits.", "duration": 10, "tags": ["représentation"] },
+    { "id": "bin_020", "subject": "Binaire", "level": 3, "question": "Soustraction 1100 − 0101 (binaire) ?", "choices": ["0110", "0111", "1001", "1010"], "correct": 1, "explanation": "12 − 5 = 7 = 0111₂.", "duration": 12, "tags": ["soustraction"] },
+    { "id": "bin_021", "subject": "Binaire", "level": 2, "question": "Quel nombre est pair en binaire ?", "choices": ["1011", "1100", "0001", "0111"], "correct": 1, "explanation": "Un binaire pair se termine par 0.", "duration": 8, "tags": ["parité"] },
+    { "id": "bin_022", "subject": "Binaire", "level": 3, "question": "2⁷ en décimal ?", "choices": ["64", "128", "256", "127"], "correct": 1, "explanation": "2⁷ = 128.", "duration": 8, "tags": ["puissances"] }
+  ]
+}

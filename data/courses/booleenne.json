@@ -1,0 +1,31 @@
+{
+  "id": "booleenne_v1",
+  "subject": "Logique booléenne",
+  "description": "Portes logiques, tables de vérité, lois de De Morgan, expressions booléennes.",
+  "version": "1.0",
+  "author": "NEUROLOCK",
+  "questions": [
+    { "id": "bool_001", "subject": "Logique booléenne", "level": 1, "question": "1 AND 0 = ?", "choices": ["0", "1", "indéterminé", "2"], "correct": 0, "explanation": "AND vaut 1 uniquement si les deux entrées sont 1.", "duration": 8, "tags": ["AND"] },
+    { "id": "bool_002", "subject": "Logique booléenne", "level": 1, "question": "1 OR 0 = ?", "choices": ["0", "1", "indéterminé", "2"], "correct": 1, "explanation": "OR vaut 1 si au moins une entrée est 1.", "duration": 8, "tags": ["OR"] },
+    { "id": "bool_003", "subject": "Logique booléenne", "level": 1, "question": "NOT 1 = ?", "choices": ["0", "1", "−1", "indéterminé"], "correct": 0, "explanation": "NOT inverse : 1 → 0.", "duration": 8, "tags": ["NOT"] },
+    { "id": "bool_004", "subject": "Logique booléenne", "level": 1, "question": "1 XOR 1 = ?", "choices": ["0", "1", "2", "indéterminé"], "correct": 0, "explanation": "XOR vaut 1 si entrées différentes.", "duration": 8, "tags": ["XOR"] },
+    { "id": "bool_005", "subject": "Logique booléenne", "level": 1, "question": "0 XOR 1 = ?", "choices": ["0", "1", "2", "indéterminé"], "correct": 1, "explanation": "Entrées différentes → 1.", "duration": 8, "tags": ["XOR"] },
+    { "id": "bool_006", "subject": "Logique booléenne", "level": 2, "question": "NAND est équivalent à ?", "choices": ["NOT(A AND B)", "NOT A AND NOT B", "A AND NOT B", "NOT(A OR B)"], "correct": 0, "explanation": "NAND = NOT(AND).", "duration": 10, "tags": ["NAND"] },
+    { "id": "bool_007", "subject": "Logique booléenne", "level": 2, "question": "NOR est équivalent à ?", "choices": ["NOT(A AND B)", "NOT(A OR B)", "A XOR B", "A AND B"], "correct": 1, "explanation": "NOR = NOT(OR).", "duration": 10, "tags": ["NOR"] },
+    { "id": "bool_008", "subject": "Logique booléenne", "level": 2, "question": "Loi de De Morgan : NOT(A AND B) = ?", "choices": ["NOT A AND NOT B", "NOT A OR NOT B", "A OR B", "NOT(A OR B)"], "correct": 1, "explanation": "NOT(A AND B) = NOT A OR NOT B.", "duration": 10, "tags": ["DeMorgan"] },
+    { "id": "bool_009", "subject": "Logique booléenne", "level": 2, "question": "Loi de De Morgan : NOT(A OR B) = ?", "choices": ["NOT A AND NOT B", "NOT A OR NOT B", "A AND B", "NOT(A AND B)"], "correct": 0, "explanation": "NOT(A OR B) = NOT A AND NOT B.", "duration": 10, "tags": ["DeMorgan"] },
+    { "id": "bool_010", "subject": "Logique booléenne", "level": 1, "question": "A AND A = ?", "choices": ["0", "1", "A", "NOT A"], "correct": 2, "explanation": "Idempotence : A AND A = A.", "duration": 8, "tags": ["lois"] },
+    { "id": "bool_011", "subject": "Logique booléenne", "level": 1, "question": "A OR A = ?", "choices": ["0", "1", "A", "NOT A"], "correct": 2, "explanation": "Idempotence : A OR A = A.", "duration": 8, "tags": ["lois"] },
+    { "id": "bool_012", "subject": "Logique booléenne", "level": 2, "question": "A AND 0 = ?", "choices": ["A", "0", "1", "NOT A"], "correct": 1, "explanation": "Élément absorbant : A AND 0 = 0.", "duration": 8, "tags": ["lois"] },
+    { "id": "bool_013", "subject": "Logique booléenne", "level": 2, "question": "A OR 1 = ?", "choices": ["A", "0", "1", "NOT A"], "correct": 2, "explanation": "Élément absorbant : A OR 1 = 1.", "duration": 8, "tags": ["lois"] },
+    { "id": "bool_014", "subject": "Logique booléenne", "level": 2, "question": "Combien de lignes a la table de vérité pour 3 variables ?", "choices": ["3", "6", "8", "9"], "correct": 2, "explanation": "2³ = 8 combinaisons.", "duration": 8, "tags": ["table-de-vérité"] },
+    { "id": "bool_015", "subject": "Logique booléenne", "level": 2, "question": "A AND NOT A = ?", "choices": ["0", "1", "A", "NOT A"], "correct": 0, "explanation": "Contradiction : toujours 0.", "duration": 8, "tags": ["lois"] },
+    { "id": "bool_016", "subject": "Logique booléenne", "level": 2, "question": "A OR NOT A = ?", "choices": ["0", "1", "A", "NOT A"], "correct": 1, "explanation": "Tiers exclu : toujours 1.", "duration": 8, "tags": ["lois"] },
+    { "id": "bool_017", "subject": "Logique booléenne", "level": 3, "question": "Simplifier : A AND (A OR B)", "choices": ["A", "B", "A AND B", "A OR B"], "correct": 0, "explanation": "Absorption : A AND (A OR B) = A.", "duration": 12, "tags": ["simplification"] },
+    { "id": "bool_018", "subject": "Logique booléenne", "level": 3, "question": "Simplifier : A OR (A AND B)", "choices": ["A", "B", "A AND B", "A OR B"], "correct": 0, "explanation": "Absorption : A OR (A AND B) = A.", "duration": 12, "tags": ["simplification"] },
+    { "id": "bool_019", "subject": "Logique booléenne", "level": 1, "question": "0 NAND 0 = ?", "choices": ["0", "1", "indéterminé", "2"], "correct": 1, "explanation": "NOT(0 AND 0) = NOT 0 = 1.", "duration": 8, "tags": ["NAND"] },
+    { "id": "bool_020", "subject": "Logique booléenne", "level": 2, "question": "Quelle porte est universelle (peut tout construire) ?", "choices": ["AND", "OR", "NAND", "XOR"], "correct": 2, "explanation": "NAND (et NOR) sont universelles.", "duration": 10, "tags": ["théorie"] },
+    { "id": "bool_021", "subject": "Logique booléenne", "level": 3, "question": "XOR de trois 1 (1⊕1⊕1) = ?", "choices": ["0", "1", "2", "3"], "correct": 1, "explanation": "1⊕1=0, 0⊕1=1.", "duration": 10, "tags": ["XOR"] },
+    { "id": "bool_022", "subject": "Logique booléenne", "level": 2, "question": "Une porte XNOR vaut 1 quand ?", "choices": ["A=B", "A≠B", "A=0", "A=1"], "correct": 0, "explanation": "XNOR = égalité.", "duration": 10, "tags": ["XNOR"] }
+  ]
+}

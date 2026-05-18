@@ -1,0 +1,57 @@
+{
+  "maze": {
+    "width": 25,
+    "height": 25,
+    "tileSize": 32,
+    "doorsCount": 5,
+    "towerSpotsCount": 10
+  },
+  "timer": {
+    "initial": 240,
+    "bonusOnCorrect": 10,
+    "penaltyOnWrong": 4,
+    "penaltyOnSkip": 6,
+    "bonusOnKill": 3,
+    "criticalThreshold": 45
+  },
+  "quiz": {
+    "defaultDuration": 10,
+    "durationMultiplier": 1.5,
+    "questionsPerRun": 15
+  },
+  "waves": {
+    "firstWaveDelay": 25,
+    "waveInterval": 60
+  },
+  "canvas": {
+    "targetFPS": 60,
+    "backgroundColor": "#0a0a1a"
+  },
+  "player": {
+    "speed": 2.5,
+    "hp": 3
+  },
+  "providers": {
+    "mistral": {
+      "label": "Mistral",
+      "endpoint": "https://api.mistral.ai/v1/chat/completions",
+      "model": "mistral-small-latest"
+    },
+    "groq": {
+      "label": "Groq",
+      "endpoint": "https://api.groq.com/openai/v1/chat/completions",
+      "model": "llama-3.1-8b-instant"
+    },
+    "gemini": {
+      "label": "Google Gemini",
+      "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+      "model": "gemini-1.5-flash"
+    },
+    "claude": {
+      "label": "Anthropic Claude",
+      "endpoint": "https://api.anthropic.com/v1/messages",
+      "model": "claude-haiku-4-5-20251001"
+    }
+  },
+  "defaultProvider": "mistral"
+}
