@@ -746,6 +746,69 @@ textarea { resize: vertical; font-family: var(--font-mono); font-size: 13px; }
 }
 .pause-box h2 { margin: 0 0 12px; color: var(--purple-light); }
 
+/* ======== Quiz timer urgency ======== */
+.quiz-timer.urgent .quiz-timer-bar::after {
+  background: linear-gradient(90deg, var(--red-bright), var(--red));
+  animation: urgency-pulse 0.4s ease-in-out infinite;
+}
+.quiz-timer.urgent #quiz-timer-text {
+  color: var(--red-bright);
+  animation: urgency-pulse 0.4s ease-in-out infinite;
+}
+@keyframes urgency-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.08); }
+}
+
+/* ======== Wave intro card (cinematic) ======== */
+#wave-card {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+  pointer-events: none;
+  animation: wave-card-anim 1.8s ease-out forwards;
+}
+#wave-card.hidden { display: none; }
+.wave-card-inner {
+  text-align: center;
+  font-family: var(--font-mono);
+  background: rgba(18, 18, 42, 0.85);
+  border: 2px solid var(--red);
+  border-radius: 16px;
+  padding: 28px 64px;
+  box-shadow: 0 0 80px rgba(226, 75, 74, 0.5), 0 20px 60px rgba(0,0,0,0.6);
+}
+.wave-card-label {
+  font-size: 14px;
+  letter-spacing: 8px;
+  color: var(--red-bright);
+  margin-bottom: 4px;
+}
+#wave-card-number {
+  font-size: 96px;
+  font-weight: 900;
+  color: white;
+  line-height: 1;
+  text-shadow: 0 0 24px rgba(226, 75, 74, 0.8);
+}
+.wave-card-sub {
+  font-size: 12px;
+  letter-spacing: 4px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  text-transform: uppercase;
+}
+@keyframes wave-card-anim {
+  0%   { opacity: 0; transform: scale(0.6); }
+  15%  { opacity: 1; transform: scale(1.05); }
+  25%  { transform: scale(1); }
+  85%  { opacity: 1; }
+  100% { opacity: 0; transform: scale(0.95); }
+}
+
 /* ======== Event banner ======== */
 #event-banner {
   position: absolute;
@@ -994,10 +1057,16 @@ textarea { resize: vertical; font-family: var(--font-mono); font-size: 13px; }
 #home-canvas-bg {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
-  z-index: 0;
+  z-index: 1;            /* above the gradient .home-bg */
 }
-.home-container { z-index: 1; }
+.home-bg { z-index: 0; }
+.home-container {
+  z-index: 2;
+  position: relative;     /* needed for z-index to apply */
+}
 
 /* ======== Recent runs ======== */
 .recent-runs {

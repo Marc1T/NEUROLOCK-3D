@@ -190,11 +190,21 @@ const Storage = (() => {
   // ---- Question history ----
   function recordQuestion(qid, correct, timeMs) {
     const save = getSave();
-    const h = save.questionHistory[qid] || { seen: 0, correct: 0, avgTime: 0 };
+    const h = save.questionHistory[qid] || { seen: 0, correct: 0, avgTime: 0, lastSeen: 0 };
     h.seen += 1;
     if (correct) h.correct += 1;
     h.avgTime = Math.round(((h.avgTime * (h.seen - 1)) + timeMs) / h.seen);
+    h.lastSeen = Date.now();
     save.questionHistory[qid] = h;
+
+    // Cap history size: evict least-recently-seen entries beyond MAX
+    const cap = (typeof Constants !== 'undefined' && Constants.STORAGE) ? Constants.STORAGE.MAX_QUESTION_HISTORY : 500;
+    const keys = Object.keys(save.questionHistory);
+    if (keys.length > cap) {
+      keys.sort((a, b) => (save.questionHistory[a].lastSeen || 0) - (save.questionHistory[b].lastSeen || 0));
+      const toDrop = keys.slice(0, keys.length - cap);
+      for (const k of toDrop) delete save.questionHistory[k];
+    }
     setSave(save);
   }
 

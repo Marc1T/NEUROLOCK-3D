@@ -223,6 +223,15 @@
   <!-- Wave / event banner -->
   <div id="event-banner" class="hidden"></div>
 
+  <!-- Wave intro card -->
+  <div id="wave-card" class="hidden">
+    <div class="wave-card-inner">
+      <div class="wave-card-label">VAGUE</div>
+      <div id="wave-card-number">1</div>
+      <div class="wave-card-sub">Préparez-vous</div>
+    </div>
+  </div>
+
   <!-- Pause overlay -->
   <div id="pause-overlay" class="hidden">
     <div class="pause-box">
@@ -368,8 +377,10 @@
   </div>
 </div>
 
-<!-- Scripts -->
+<!-- Scripts (load order: constants → storage → fx → audio → maze → renderer → player → enemies → towers → quiz → adaptive → ai → ui → game → main) -->
+<script src="js/constants.js"></script>
 <script src="js/storage.js"></script>
+<script src="js/fx.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/maze.js"></script>
 <script src="js/renderer.js"></script>

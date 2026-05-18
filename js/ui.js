@@ -156,80 +156,236 @@ const UI = (() => {
     startHomeBackground();
   }
 
-  // ---- Animated home background (particle field) ----
+  // ─── Home neural-network background ────────────────────────────────────
+  // A breathing neural net: nodes drift, fire randomly, pulses travel along
+  // synapses, mouse proximity activates nearby nodes. ~60 fps on a mid laptop.
   let homeBgRaf = null;
+  let homeBgState = null;
+
   function startHomeBackground() {
     const canvas = $('#home-canvas-bg');
     if (!canvas) return;
     if (homeBgRaf) cancelAnimationFrame(homeBgRaf);
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { alpha: true });
+
+    // ── Setup: nodes, connections (precomputed adjacency for perf), pulses
+    const COLORS = ['#a87fdf', '#36c896', '#b89cff'];
+    const NODE_COUNT = 64;
+    const LINK_DIST = 160;        // px — visual edge threshold
+    const LINK_DIST_SQ = LINK_DIST * LINK_DIST;
+    const FIRE_INTERVAL_MIN = 1800; // ms
+    const FIRE_INTERVAL_MAX = 5500;
+
+    const state = {
+      nodes: [],
+      pulses: [],
+      mouseX: -9999,
+      mouseY: -9999,
+      lastTs: 0
+    };
+
+    /** Initialise the network — clusters of nodes spread with soft randomness. */
+    function build() {
+      state.nodes.length = 0;
+      const W = canvas.width, H = canvas.height;
+      for (let i = 0; i < NODE_COUNT; i++) {
+        state.nodes.push({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          vx: (Math.random() - 0.5) * 0.20,
+          vy: (Math.random() - 0.5) * 0.20,
+          baseR: 1.3 + Math.random() * 1.8,
+          color: COLORS[(Math.random() * COLORS.length) | 0],
+          activation: 0,
+          nextFire: performance.now() + Math.random() * FIRE_INTERVAL_MAX
+        });
+      }
+    }
+
     const resize = () => {
       canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
+      build();
     };
     resize();
     window.addEventListener('resize', resize);
 
-    // particle pool
-    const N = 80;
-    const parts = [];
-    for (let i = 0; i < N; i++) {
-      parts.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.25,
-        vy: (Math.random() - 0.5) * 0.25,
-        r: 0.5 + Math.random() * 1.8,
-        c: Math.random() < 0.3 ? '#36c896' : '#a87fdf',
-        alpha: 0.2 + Math.random() * 0.6
-      });
-    }
+    // Mouse interaction — document-level (canvas has pointer-events: none)
+    const onMove = (ev) => {
+      const r = canvas.getBoundingClientRect();
+      state.mouseX = ev.clientX - r.left;
+      state.mouseY = ev.clientY - r.top;
+    };
+    const onLeave = () => { state.mouseX = -9999; state.mouseY = -9999; };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseleave', onLeave);
 
-    let active = true;
-    const step = () => {
-      if (!active) return;
-      // only animate when home is active to save CPU
+    homeBgState = state;
+
+    // ── Main loop
+    const step = (ts) => {
       if (!$('#screen-home').classList.contains('active')) {
+        // Pause while home is hidden — saves battery
         homeBgRaf = requestAnimationFrame(step);
         return;
       }
-      ctx.fillStyle = 'rgba(10, 10, 26, 0.25)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      for (const p of parts) {
-        p.x += p.vx; p.y += p.vy;
-        if (p.x < 0) p.x = canvas.width;
-        if (p.x > canvas.width) p.x = 0;
-        if (p.y < 0) p.y = canvas.height;
-        if (p.y > canvas.height) p.y = 0;
-        ctx.fillStyle = p.c;
-        ctx.globalAlpha = p.alpha;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.globalAlpha = 1;
+      const dt = state.lastTs ? Math.min(50, ts - state.lastTs) : 16;
+      state.lastTs = ts;
 
-      // faint connecting lines for close particles
-      ctx.strokeStyle = 'rgba(124, 92, 191, 0.08)';
-      ctx.lineWidth = 1;
-      for (let i = 0; i < parts.length; i++) {
-        for (let j = i + 1; j < parts.length; j++) {
-          const a = parts[i], b = parts[j];
-          const dx = a.x - b.x, dy = a.y - b.y;
-          const d2 = dx*dx + dy*dy;
-          if (d2 < 10000) {
-            ctx.beginPath();
-            ctx.moveTo(a.x, a.y);
-            ctx.lineTo(b.x, b.y);
-            ctx.stroke();
+      // Trail-fade overlay (subtle motion blur)
+      ctx.fillStyle = 'rgba(10, 10, 26, 0.32)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // ── 1. Update nodes (drift, decay activation, auto-fire)
+      const nodes = state.nodes;
+      for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i];
+        n.x += n.vx * (dt / 16.67);
+        n.y += n.vy * (dt / 16.67);
+        // Wrap around edges
+        if (n.x < 0) n.x += canvas.width;
+        if (n.x > canvas.width) n.x -= canvas.width;
+        if (n.y < 0) n.y += canvas.height;
+        if (n.y > canvas.height) n.y -= canvas.height;
+        // Decay
+        n.activation *= 0.93;
+
+        // Mouse proximity boost
+        const dxm = n.x - state.mouseX;
+        const dym = n.y - state.mouseY;
+        const dmSq = dxm * dxm + dym * dym;
+        if (dmSq < 14400) { // 120²
+          n.activation = Math.min(1, n.activation + (1 - dmSq / 14400) * 0.06);
+        }
+
+        // Auto-fire: pick a random neighbor and send a pulse
+        if (ts >= n.nextFire) {
+          n.activation = 1;
+          n.nextFire = ts + FIRE_INTERVAL_MIN + Math.random() * (FIRE_INTERVAL_MAX - FIRE_INTERVAL_MIN);
+          // Find a neighbor within LINK_DIST and emit a pulse
+          const targetIdx = pickNearestNeighbor(i);
+          if (targetIdx >= 0) {
+            state.pulses.push({
+              from: i,
+              to: targetIdx,
+              progress: 0,
+              speed: 0.0014 + Math.random() * 0.0012, // per ms
+              color: n.color,
+              born: ts
+            });
           }
         }
       }
 
+      // ── 2. Draw connections (only visible pairs)
+      //    Two passes: faint baseline, then bright activated edges on top.
+      for (let i = 0; i < nodes.length; i++) {
+        const a = nodes[i];
+        for (let j = i + 1; j < nodes.length; j++) {
+          const b = nodes[j];
+          const dx = a.x - b.x;
+          const dy = a.y - b.y;
+          const d2 = dx * dx + dy * dy;
+          if (d2 > LINK_DIST_SQ) continue;
+          // Alpha falls off with distance, boosted by node activations
+          const dist = Math.sqrt(d2);
+          const base = 1 - dist / LINK_DIST;          // 0..1
+          const boost = Math.max(a.activation, b.activation);
+          const alpha = base * (0.10 + boost * 0.55);
+          ctx.strokeStyle = `rgba(168, 127, 223, ${alpha})`;
+          ctx.lineWidth = 0.6 + boost * 1.0;
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+        }
+      }
+
+      // ── 3. Update + draw pulses
+      for (let p = state.pulses.length - 1; p >= 0; p--) {
+        const pulse = state.pulses[p];
+        pulse.progress += pulse.speed * dt;
+        if (pulse.progress >= 1) {
+          // Pulse arrived — activate target (chain firing)
+          const target = nodes[pulse.to];
+          if (target) target.activation = Math.min(1, target.activation + 0.85);
+          state.pulses.splice(p, 1);
+          continue;
+        }
+        const from = nodes[pulse.from];
+        const to = nodes[pulse.to];
+        if (!from || !to) { state.pulses.splice(p, 1); continue; }
+        const px = from.x + (to.x - from.x) * pulse.progress;
+        const py = from.y + (to.y - from.y) * pulse.progress;
+
+        // Bright head with halo
+        ctx.shadowColor = pulse.color;
+        ctx.shadowBlur = 12;
+        ctx.fillStyle = pulse.color;
+        ctx.globalAlpha = 1;
+        ctx.beginPath();
+        ctx.arc(px, py, 2.8, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Short tail
+        const tailLen = 0.10;
+        const tx = from.x + (to.x - from.x) * Math.max(0, pulse.progress - tailLen);
+        const ty = from.y + (to.y - from.y) * Math.max(0, pulse.progress - tailLen);
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = pulse.color;
+        ctx.globalAlpha = 0.5;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(tx, ty);
+        ctx.lineTo(px, py);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+      ctx.shadowBlur = 0;
+
+      // ── 4. Draw nodes with activation-driven glow
+      for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i];
+        const r = n.baseR * (1 + n.activation * 0.8);
+        if (n.activation > 0.05) {
+          // Halo
+          ctx.shadowColor = n.color;
+          ctx.shadowBlur = 14 * n.activation;
+        }
+        ctx.fillStyle = n.color;
+        ctx.globalAlpha = 0.4 + n.activation * 0.6;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+      ctx.globalAlpha = 1;
+
       homeBgRaf = requestAnimationFrame(step);
     };
-    step();
+
+    /**
+     * Find a near-ish neighbor (within LINK_DIST) to fire toward. We sample
+     * a few random candidates rather than computing all-pairs to keep it cheap.
+     */
+    function pickNearestNeighbor(sourceIdx) {
+      const a = state.nodes[sourceIdx];
+      const N = state.nodes.length;
+      let bestIdx = -1, bestSq = LINK_DIST_SQ;
+      // Sample 12 random candidates
+      for (let k = 0; k < 12; k++) {
+        const j = (Math.random() * N) | 0;
+        if (j === sourceIdx) continue;
+        const b = state.nodes[j];
+        const dx = a.x - b.x, dy = a.y - b.y;
+        const d2 = dx * dx + dy * dy;
+        if (d2 < bestSq) { bestSq = d2; bestIdx = j; }
+      }
+      return bestIdx;
+    }
+
+    homeBgRaf = requestAnimationFrame(step);
   }
 
   // ---- COURSE SELECT ----
@@ -612,6 +768,7 @@ const UI = (() => {
       <div class="stat"><div class="stat-label">Score</div><div class="stat-value">${result.score}</div></div>
       <div class="stat"><div class="stat-label">Précision</div><div class="stat-value">${(result.accuracy * 100).toFixed(0)}%</div></div>
       <div class="stat"><div class="stat-label">Temps restant</div><div class="stat-value">${formatTime(result.timeLeft)}</div></div>
+      <div class="stat"><div class="stat-label">Meilleur combo</div><div class="stat-value">×${result.bestCombo || 0}</div></div>
       <div class="stat"><div class="stat-label">Tours posées</div><div class="stat-value">${result.towersPlaced}</div></div>
       <div class="stat"><div class="stat-label">Ennemis détruits</div><div class="stat-value">${result.kills}</div></div>
       <div class="stat"><div class="stat-label">Questions</div><div class="stat-value">${result.answeredCorrect}/${result.answeredTotal}</div></div>
@@ -704,7 +861,25 @@ const UI = (() => {
     setTimeout(() => el.classList.add('hidden'), ms);
   }
 
+  /**
+   * Cinematic wave card: dramatic full-screen number + label, auto-hides.
+   * @param {number} num wave number
+   */
+  function showWaveCard(num) {
+    const el = $('#wave-card');
+    const numEl = $('#wave-card-number');
+    if (!el || !numEl) return;
+    numEl.textContent = num;
+    el.classList.remove('hidden');
+    // re-trigger animation
+    el.style.animation = 'none';
+    void el.offsetWidth;
+    el.style.animation = '';
+    setTimeout(() => el.classList.add('hidden'), 1800);
+  }
+
   return {
-    init, showScreen, toast, showResults, formatTime, showEventBanner
+    init, showScreen, toast, showResults, formatTime, showEventBanner, showWaveCard,
+    showLoading, updateLoading, hideLoading
   };
 })();
