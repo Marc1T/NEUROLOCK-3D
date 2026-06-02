@@ -1,6 +1,6 @@
 {
   "_comment": "Copy this file to keys.local.json and paste your default API keys. keys.local.json is gitignored. Loaded at startup when present; otherwise the user enters keys via the Settings screen (stored in cookies).",
-  "mistral": "0SRSz4wCGNEF4dCN4RTCzOrRtwtJgG6g",
+  "mistral": "",
   "groq": "",
   "gemini": "",
   "claude": ""
