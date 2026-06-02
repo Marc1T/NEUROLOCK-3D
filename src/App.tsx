@@ -18,9 +18,10 @@ import {
   Play, Settings, UserPlus, BookOpen, ChevronRight, Key, Zap,
   Shield, Target, Clock, Brain, Cpu, Trophy, RotateCcw, Palette, Volume2, VolumeX,
   Plus, Trash2, Edit3, FileText, Sparkles, Download, Upload, X, CheckCircle,
-  AlertCircle, RefreshCw, BarChart2, HelpCircle, Pause
+  AlertCircle, RefreshCw, BarChart2, HelpCircle, Pause, Eye, EyeOff, Loader2
 } from 'lucide-react';
 import { useIsTouchDevice } from './lib/useIsTouchDevice';
+import { useApiKeys, getUserApiKeys } from './lib/useApiKeys';
 
 const THEME_STORAGE_KEY = 'neurolock_theme';
 const TUTORIAL_STORAGE_KEY = 'neurolock_tutorial_done';
@@ -595,6 +596,7 @@ function TeacherScreen({
         body: JSON.stringify({
           text: courseText,
           numQuestions: numQuestions,
+          userKeys: getUserApiKeys(),
         })
       });
 
@@ -1491,6 +1493,144 @@ function CourseCard({ title, desc, count, difficulty, tags, onClick, theme, onDe
     );
 }
 
+type ApiProvider = 'mistral' | 'groq';
+type KeyTestState = 'idle' | 'testing' | 'ok' | 'fail';
+
+/**
+ * Inline panel inside SettingsScreen letting the player paste their own
+ * Mistral / Groq keys when the deployed server has no env keys.
+ * Keys are stored in localStorage via useApiKeys() and forwarded to the
+ * server on each /api/generate-questions call (and tested via /api/test-key).
+ */
+function ApiKeysSection({ theme }: { theme: ThemeColors }) {
+    const { keys, setKey, clearKey } = useApiKeys();
+    const [show, setShow] = useState<{ mistral: boolean, groq: boolean }>({ mistral: false, groq: false });
+    const [testState, setTestState] = useState<{ mistral: KeyTestState, groq: KeyTestState }>({ mistral: 'idle', groq: 'idle' });
+    const [testMsg, setTestMsg] = useState<{ mistral: string, groq: string }>({ mistral: '', groq: '' });
+
+    const testKey = async (provider: ApiProvider) => {
+        const value = keys[provider];
+        if (!value) return;
+        setTestState(prev => ({ ...prev, [provider]: 'testing' }));
+        setTestMsg(prev => ({ ...prev, [provider]: '' }));
+        try {
+            const resp = await fetch('/api/test-key', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ provider, apiKey: value }),
+            });
+            const data = await resp.json();
+            if (resp.ok && data.ok) {
+                setTestState(prev => ({ ...prev, [provider]: 'ok' }));
+                setTestMsg(prev => ({ ...prev, [provider]: `OK — modèle ${data.model || '?'}` }));
+            } else {
+                setTestState(prev => ({ ...prev, [provider]: 'fail' }));
+                setTestMsg(prev => ({ ...prev, [provider]: data.error || `HTTP ${resp.status}` }));
+            }
+        } catch (e: any) {
+            setTestState(prev => ({ ...prev, [provider]: 'fail' }));
+            setTestMsg(prev => ({ ...prev, [provider]: e?.message || 'Erreur réseau' }));
+        }
+    };
+
+    const renderRow = (provider: ApiProvider, label: string, placeholder: string) => {
+        const value = keys[provider];
+        const isShown = show[provider];
+        const state = testState[provider];
+        const msg = testMsg[provider];
+        return (
+            <div className="space-y-2">
+                <label className="text-[11px] font-mono uppercase tracking-widest flex items-center justify-between" style={{ color: theme.textMuted }}>
+                    <span>{label}</span>
+                    {state === 'ok' && <span className="flex items-center gap-1" style={{ color: theme.green }}><CheckCircle size={12} /> Valide</span>}
+                    {state === 'fail' && <span className="flex items-center gap-1" style={{ color: theme.red }}><AlertCircle size={12} /> Erreur</span>}
+                </label>
+                <div className="flex gap-2">
+                    <div className="flex-1 relative">
+                        <input
+                            type={isShown ? 'text' : 'password'}
+                            value={value}
+                            onChange={(e) => setKey(provider, e.target.value)}
+                            placeholder={placeholder}
+                            spellCheck={false}
+                            autoComplete="off"
+                            className="w-full p-3 pr-10 rounded-xl border font-mono text-xs"
+                            style={{
+                                backgroundColor: theme.bgDark,
+                                borderColor: state === 'ok' ? theme.green : state === 'fail' ? theme.red : theme.border,
+                                color: theme.textMain,
+                            }}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShow(prev => ({ ...prev, [provider]: !isShown }))}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded hover:bg-white/5"
+                            style={{ color: theme.textMuted }}
+                            aria-label={isShown ? 'Masquer' : 'Afficher'}
+                        >
+                            {isShown ? <EyeOff size={14} /> : <Eye size={14} />}
+                        </button>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => testKey(provider)}
+                        disabled={!value || state === 'testing'}
+                        className="px-3 rounded-xl border font-mono text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
+                        style={{ borderColor: theme.primary, backgroundColor: `${theme.primary}22`, color: theme.primaryLight }}
+                    >
+                        {state === 'testing' ? <Loader2 size={12} className="animate-spin" /> : <Zap size={12} />}
+                        Tester
+                    </button>
+                    {value && (
+                        <button
+                            type="button"
+                            onClick={() => {
+                                clearKey(provider);
+                                setTestState(prev => ({ ...prev, [provider]: 'idle' }));
+                                setTestMsg(prev => ({ ...prev, [provider]: '' }));
+                            }}
+                            className="px-3 rounded-xl border font-mono text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5"
+                            style={{ borderColor: theme.border, color: theme.textMuted }}
+                            aria-label="Effacer la clé"
+                        >
+                            <Trash2 size={12} />
+                        </button>
+                    )}
+                </div>
+                {msg && (
+                    <div className="text-[10px] font-mono leading-tight pl-1" style={{ color: state === 'ok' ? theme.green : theme.red }}>
+                        {msg}
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+    return (
+        <div className="space-y-4 pt-4">
+            <label className="text-sm font-mono uppercase flex items-center gap-2" style={{ color: theme.textMuted }}>
+                <Key size={16} /> Clés API IA (optionnel)
+            </label>
+            <div className="p-3 rounded-xl border text-[11px] font-mono leading-relaxed space-y-1.5"
+                 style={{ backgroundColor: `${theme.amber}11`, borderColor: `${theme.amber}55`, color: theme.textMain }}>
+                <div className="flex items-start gap-2">
+                    <AlertCircle size={14} style={{ color: theme.amber }} className="shrink-0 mt-0.5" />
+                    <div>
+                        Si l'instance n'a pas de clés serveur (<code style={{ color: theme.accent1 }}>.env</code>),
+                        colle ici les tiennes. Elles restent stockées <strong>uniquement sur cet appareil</strong> et
+                        sont transmises directement aux APIs (Mistral / Groq) via le serveur, sans être enregistrées côté backend.
+                    </div>
+                </div>
+            </div>
+            {renderRow('mistral', 'Mistral (primaire)', 'mistral-xxxxxxxxxxxxxxxxxxxxxxxxxxxxx')}
+            {renderRow('groq', 'Groq (repli)', 'gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')}
+            <div className="text-[10px] font-mono opacity-70" style={{ color: theme.textMuted }}>
+                Obtenir une clé : <span style={{ color: theme.accent1 }}>console.mistral.ai</span> · <span style={{ color: theme.accent1 }}>console.groq.com</span>
+            </div>
+        </div>
+    );
+}
+
 function SettingsScreen({ onBack, themeKey, setThemeKey, theme, onResetTutorial }: { onBack: () => void, themeKey: string, setThemeKey: (k: string) => void, theme: ThemeColors, onResetTutorial: () => void }) {
     const [volume, setVolumeState] = useState(() => AudioEngine.getVolume());
     const handleVolume = (v: number) => {
@@ -1558,16 +1698,7 @@ function SettingsScreen({ onBack, themeKey, setThemeKey, theme, onResetTutorial 
                         </button>
                     </div>
 
-                    <div className="space-y-2 pt-4 text-xs font-mono leading-relaxed" style={{ color: theme.textMuted }}>
-                        <div className="flex items-center gap-2 mb-2" style={{ color: theme.textMain }}>
-                            <Key size={14} /> CONFIGURATION IA
-                        </div>
-                        <p>
-                            Les clés des fournisseurs IA (<strong>Mistral</strong> en primaire, <strong>Groq</strong> en repli)
-                            sont configurées côté serveur dans le fichier <code style={{ color: theme.accent1 }}>.env</code>.
-                            Le générateur de cours IA de la console enseignant les utilise automatiquement.
-                        </p>
-                    </div>
+                    <ApiKeysSection theme={theme} />
                 </div>
             </div>
         </motion.div>

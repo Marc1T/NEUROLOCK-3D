@@ -118,22 +118,44 @@ function normalizeQuestions(raw: any[]): any[] {
     .filter(q => q.choices.length === 4);
 }
 
+interface UserKeys {
+  mistral?: string;
+  groq?: string;
+}
+
+function pickKey(provider: Provider, userKeys: UserKeys | undefined): string | undefined {
+  // User-supplied keys override env vars so a self-hosted player can BYOK
+  // without restarting the server.
+  if (provider === "mistral") {
+    return (userKeys?.mistral && userKeys.mistral.trim()) || process.env.MISTRAL_API_KEY;
+  }
+  return (userKeys?.groq && userKeys.groq.trim()) || process.env.GROQ_API_KEY;
+}
+
+function parseUserKeys(raw: unknown): UserKeys | undefined {
+  if (!raw || typeof raw !== "object") return undefined;
+  const obj = raw as Record<string, unknown>;
+  const out: UserKeys = {};
+  if (typeof obj.mistral === "string") out.mistral = obj.mistral;
+  if (typeof obj.groq === "string") out.groq = obj.groq;
+  return out;
+}
+
 async function generateWithProvider(
   provider: Provider,
-  prompt: string
+  prompt: string,
+  userKeys?: UserKeys
 ): Promise<{ questions: any[]; provider: Provider; model: string }> {
+  const key = pickKey(provider, userKeys);
+  if (!key) throw new Error(`Clé ${provider} manquante (ni serveur ni utilisateur)`);
   if (provider === "mistral") {
-    const key = process.env.MISTRAL_API_KEY;
-    if (!key) throw new Error("MISTRAL_API_KEY manquante");
     const model = process.env.MISTRAL_MODEL || "mistral-large-latest";
     const raw = await callOpenAICompatible(MISTRAL_URL, key, model, prompt);
     return { questions: normalizeQuestions(extractJsonArray(raw)), provider, model };
   }
-  const key = process.env.GROQ_API_KEY;
-  if (!key) throw new Error("GROQ_API_KEY manquante");
   const model = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
   const raw = await callOpenAICompatible(GROQ_URL, key, model, prompt);
-  return { questions: extractJsonArray(raw), provider, model };
+  return { questions: normalizeQuestions(extractJsonArray(raw)), provider, model };
 }
 
 async function startServer() {
@@ -143,18 +165,20 @@ async function startServer() {
   app.use(express.json({ limit: "10mb" }));
 
   app.post("/api/generate-questions", async (req, res) => {
-    const { text, numQuestions = 10 } = req.body || {};
+    const { text, numQuestions = 10, userKeys: rawUserKeys } = req.body || {};
     if (typeof text !== "string" || text.trim().length === 0) {
       return res.status(400).json({ error: "Champ 'text' requis" });
     }
 
+    const userKeys = parseUserKeys(rawUserKeys);
     const prompt = buildPrompt(text, Number(numQuestions) || 10);
     const errors: string[] = [];
 
     for (const provider of ["mistral", "groq"] as Provider[]) {
       try {
-        console.log(`[AI] Tentative via ${provider}…`);
-        const result = await generateWithProvider(provider, prompt);
+        const source = userKeys?.[provider]?.trim() ? "user" : "env";
+        console.log(`[AI] Tentative via ${provider} (clé ${source})…`);
+        const result = await generateWithProvider(provider, prompt, userKeys);
         console.log(`[AI] OK via ${provider} (${result.model}) → ${result.questions.length} questions`);
         return res.json({ questions: result.questions, provider: result.provider, model: result.model });
       } catch (err: any) {
@@ -168,6 +192,47 @@ async function startServer() {
       error: "Aucun fournisseur IA n'a répondu correctement",
       details: errors,
     });
+  });
+
+  // Lightweight key-validation endpoint used by SettingsScreen "Tester" button.
+  // Sends a 1-token completion to confirm the key authenticates.
+  app.post("/api/test-key", async (req, res) => {
+    const { provider, apiKey } = req.body || {};
+    if (provider !== "mistral" && provider !== "groq") {
+      return res.status(400).json({ ok: false, error: "Provider doit être 'mistral' ou 'groq'" });
+    }
+    if (typeof apiKey !== "string" || apiKey.trim().length < 8) {
+      return res.status(400).json({ ok: false, error: "Clé API absente ou invalide" });
+    }
+    const url = provider === "mistral" ? MISTRAL_URL : GROQ_URL;
+    const model = provider === "mistral"
+      ? (process.env.MISTRAL_MODEL || "mistral-large-latest")
+      : (process.env.GROQ_MODEL || "llama-3.3-70b-versatile");
+    try {
+      const resp = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey.trim()}`,
+        },
+        body: JSON.stringify({
+          model,
+          messages: [{ role: "user", content: "ping" }],
+          max_tokens: 1,
+          temperature: 0,
+        }),
+      });
+      if (resp.ok) {
+        return res.json({ ok: true, provider, model });
+      }
+      const body = await resp.text();
+      // 401/403 = bad key, 429 = rate limit but key valid, 400 = bad payload
+      // 429 we treat as success because the key authenticated
+      if (resp.status === 429) return res.json({ ok: true, provider, model, note: "rate-limited mais valide" });
+      return res.status(200).json({ ok: false, error: `HTTP ${resp.status} — ${body.slice(0, 200)}` });
+    } catch (e: any) {
+      return res.status(200).json({ ok: false, error: e?.message || "Erreur réseau" });
+    }
   });
 
   if (process.env.NODE_ENV !== "production") {

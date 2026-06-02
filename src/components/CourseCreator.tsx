@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Question, ThemeColors } from '../types';
 import { extractTextFromPDF, PDFExtractionProgress } from '../lib/pdfExtractor';
 import { Upload, FileText, Sparkles, X, CheckCircle, AlertCircle, RefreshCw, Cpu, Brain, Play } from 'lucide-react';
+import { getUserApiKeys } from '../lib/useApiKeys';
 
 interface CourseCreatorProps {
   theme: ThemeColors;
@@ -81,7 +82,7 @@ export function CourseCreator({ theme, existingQuestions, onClose, onCreated, on
       const resp = await fetch('/api/generate-questions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, numQuestions }),
+        body: JSON.stringify({ text, numQuestions, userKeys: getUserApiKeys() }),
       });
       if (!resp.ok) {
         const body = await resp.text();
