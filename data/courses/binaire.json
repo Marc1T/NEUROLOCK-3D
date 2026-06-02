@@ -2,7 +2,7 @@
   "id": "binaire_v1",
   "subject": "Binaire",
   "description": "Conversions binaire ↔ décimal, représentation sur N bits, opérations.",
-  "version": "1.0",
+  "version": "1.1",
   "author": "NEUROLOCK",
   "questions": [
     { "id": "bin_001", "subject": "Binaire", "level": 1, "question": "Que vaut 1010₂ en décimal ?", "choices": ["8", "10", "12", "14"], "correct": 1, "explanation": "1×8 + 0×4 + 1×2 + 0×1 = 10.", "duration": 8, "tags": ["conversion"] },
@@ -26,6 +26,14 @@
     { "id": "bin_019", "subject": "Binaire", "level": 2, "question": "Combien de bits pour 1000 valeurs distinctes (mini) ?", "choices": ["8", "9", "10", "16"], "correct": 2, "explanation": "2¹⁰ = 1024 ≥ 1000, donc 10 bits.", "duration": 10, "tags": ["représentation"] },
     { "id": "bin_020", "subject": "Binaire", "level": 3, "question": "Soustraction 1100 − 0101 (binaire) ?", "choices": ["0110", "0111", "1001", "1010"], "correct": 1, "explanation": "12 − 5 = 7 = 0111₂.", "duration": 12, "tags": ["soustraction"] },
     { "id": "bin_021", "subject": "Binaire", "level": 2, "question": "Quel nombre est pair en binaire ?", "choices": ["1011", "1100", "0001", "0111"], "correct": 1, "explanation": "Un binaire pair se termine par 0.", "duration": 8, "tags": ["parité"] },
-    { "id": "bin_022", "subject": "Binaire", "level": 3, "question": "2⁷ en décimal ?", "choices": ["64", "128", "256", "127"], "correct": 1, "explanation": "2⁷ = 128.", "duration": 8, "tags": ["puissances"] }
+    { "id": "bin_022", "subject": "Binaire", "level": 3, "question": "2⁷ en décimal ?", "choices": ["64", "128", "256", "127"], "correct": 1, "explanation": "2⁷ = 128.", "duration": 8, "tags": ["puissances"] },
+    { "id": "bin_023", "subject": "Binaire", "level": 1, "question": "Binaire de 3 ?", "choices": ["10", "11", "100", "101"], "correct": 1, "explanation": "2+1 = 3 → 11.", "duration": 6, "tags": ["conversion"] },
+    { "id": "bin_024", "subject": "Binaire", "level": 1, "question": "Décimal de 10000₂ ?", "choices": ["10", "16", "100", "1000"], "correct": 1, "explanation": "2⁴ = 16.", "duration": 8, "tags": ["puissances"] },
+    { "id": "bin_025", "subject": "Binaire", "level": 2, "question": "1010 × 10 (binaire) = ?", "choices": ["10100", "11010", "10010", "10000"], "correct": 0, "explanation": "×2 = décalage gauche : 10100.", "duration": 10, "tags": ["multiplication"] },
+    { "id": "bin_026", "subject": "Binaire", "level": 2, "question": "1 Ko vaut combien d'octets (sens informatique strict) ?", "choices": ["1000", "1024", "8000", "8192"], "correct": 1, "explanation": "1 Kio = 2¹⁰ = 1024 octets (norme stricte).", "duration": 10, "tags": ["unités"] },
+    { "id": "bin_027", "subject": "Binaire", "level": 2, "question": "Que vaut 11111111₂ en décimal ?", "choices": ["127", "128", "255", "256"], "correct": 2, "explanation": "8 bits à 1 = 2⁸−1 = 255.", "duration": 8, "tags": ["conversion"] },
+    { "id": "bin_028", "subject": "Binaire", "level": 3, "question": "Décalage à droite de 1100₂ d'1 bit donne ?", "choices": ["0110", "0011", "1001", "1110"], "correct": 0, "explanation": "Décalage droit = ÷2 → 12/2 = 6 → 0110.", "duration": 10, "tags": ["décalage"] },
+    { "id": "bin_029", "subject": "Binaire", "level": 3, "question": "Combien d'octets pour stocker un entier 64 bits ?", "choices": ["4", "6", "8", "16"], "correct": 2, "explanation": "64 bits = 8 octets.", "duration": 10, "tags": ["représentation"] },
+    { "id": "bin_030", "subject": "Binaire", "level": 3, "question": "1010₂ XOR 1100₂ = ?", "choices": ["0110", "1110", "1000", "0010"], "correct": 0, "explanation": "XOR bit à bit : 0110.", "duration": 12, "tags": ["XOR"] }
   ]
 }

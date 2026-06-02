@@ -1,13 +1,14 @@
-# Keys & secrets
-data/keys.local.json
-.env
-.env.local
-
-# OS
+node_modules/
+build/
+dist/
+coverage/
 .DS_Store
-Thumbs.db
-
-# Editor
-.vscode/
+*.log
+.env*
+!.env.example
+docs/
 .idea/
-*.swp
+.vscode/
+.cache/
+.claude/
+.claude*

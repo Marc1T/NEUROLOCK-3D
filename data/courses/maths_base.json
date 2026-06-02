@@ -2,7 +2,7 @@
   "id": "maths_base_v1",
   "subject": "Maths de base",
   "description": "Puissances, racines, fractions, pourcentages, équations 1er degré.",
-  "version": "1.0",
+  "version": "1.1",
   "author": "NEUROLOCK",
   "questions": [
     { "id": "m_001", "subject": "Maths de base", "level": 1, "question": "2³ = ?", "choices": ["6", "8", "9", "12"], "correct": 1, "explanation": "2×2×2 = 8.", "duration": 8, "tags": ["puissances"] },
@@ -26,6 +26,14 @@
     { "id": "m_019", "subject": "Maths de base", "level": 2, "question": "1/3 + 1/3 + 1/3 = ?", "choices": ["1", "2/3", "3/9", "1/9"], "correct": 0, "explanation": "Trois tiers = 1.", "duration": 8, "tags": ["fractions"] },
     { "id": "m_020", "subject": "Maths de base", "level": 3, "question": "Si 20 % d'un nombre = 8, ce nombre est ?", "choices": ["20", "30", "40", "80"], "correct": 2, "explanation": "8 / 0,2 = 40.", "duration": 12, "tags": ["pourcentages"] },
     { "id": "m_021", "subject": "Maths de base", "level": 2, "question": "Périmètre d'un carré de 5 cm ?", "choices": ["10 cm", "15 cm", "20 cm", "25 cm"], "correct": 2, "explanation": "4 × 5 = 20.", "duration": 10, "tags": ["géométrie"] },
-    { "id": "m_022", "subject": "Maths de base", "level": 2, "question": "Aire d'un triangle base 4, hauteur 6 ?", "choices": ["10", "12", "24", "20"], "correct": 1, "explanation": "(4×6)/2 = 12.", "duration": 10, "tags": ["géométrie"] }
+    { "id": "m_022", "subject": "Maths de base", "level": 2, "question": "Aire d'un triangle base 4, hauteur 6 ?", "choices": ["10", "12", "24", "20"], "correct": 1, "explanation": "(4×6)/2 = 12.", "duration": 10, "tags": ["géométrie"] },
+    { "id": "m_023", "subject": "Maths de base", "level": 1, "question": "Combien font 9 × 8 ?", "choices": ["56", "63", "72", "81"], "correct": 2, "explanation": "Table de 9.", "duration": 6, "tags": ["multiplication"] },
+    { "id": "m_024", "subject": "Maths de base", "level": 1, "question": "100 ÷ 4 = ?", "choices": ["20", "25", "30", "40"], "correct": 1, "explanation": "4 × 25 = 100.", "duration": 6, "tags": ["division"] },
+    { "id": "m_025", "subject": "Maths de base", "level": 2, "question": "Aire d'un cercle de rayon 3 (π ≈ 3,14) ?", "choices": ["~9,42", "~18,84", "~28,26", "~14,13"], "correct": 2, "explanation": "πr² = 3,14 × 9 ≈ 28,26.", "duration": 12, "tags": ["géométrie"] },
+    { "id": "m_026", "subject": "Maths de base", "level": 2, "question": "Combien font 15 % de 80 ?", "choices": ["8", "10", "12", "16"], "correct": 2, "explanation": "80 × 0,15 = 12.", "duration": 10, "tags": ["pourcentages"] },
+    { "id": "m_027", "subject": "Maths de base", "level": 3, "question": "Combien de diviseurs a 24 ?", "choices": ["6", "7", "8", "10"], "correct": 2, "explanation": "1,2,3,4,6,8,12,24 → 8 diviseurs.", "duration": 14, "tags": ["arithmétique"] },
+    { "id": "m_028", "subject": "Maths de base", "level": 3, "question": "Résoudre x² = 49. x = ?", "choices": ["±5", "±6", "±7", "±8"], "correct": 2, "explanation": "x = ±7 car 7² = 49.", "duration": 12, "tags": ["équation"] },
+    { "id": "m_029", "subject": "Maths de base", "level": 2, "question": "Convertir 0,75 en fraction simplifiée :", "choices": ["3/4", "1/2", "2/3", "7/10"], "correct": 0, "explanation": "75/100 = 3/4.", "duration": 12, "tags": ["fractions"] },
+    { "id": "m_030", "subject": "Maths de base", "level": 3, "question": "(a + b)² = ?", "choices": ["a² + b²", "a² + 2ab + b²", "a² − b²", "2(a + b)"], "correct": 1, "explanation": "Identité remarquable.", "duration": 12, "tags": ["identités"] }
   ]
 }

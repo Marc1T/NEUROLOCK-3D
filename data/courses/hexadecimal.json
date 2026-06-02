@@ -2,7 +2,7 @@
   "id": "hexadecimal_v1",
   "subject": "Hexadécimal",
   "description": "Conversions hexa ↔ décimal ↔ binaire, notation 0x, couleurs RGB.",
-  "version": "1.0",
+  "version": "1.1",
   "author": "NEUROLOCK",
   "questions": [
     { "id": "hex_001", "subject": "Hexadécimal", "level": 1, "question": "Quel chiffre hexadécimal vaut 10 ?", "choices": ["9", "A", "B", "F"], "correct": 1, "explanation": "A = 10 en hexa.", "duration": 8, "tags": ["base"] },
@@ -26,6 +26,14 @@
     { "id": "hex_019", "subject": "Hexadécimal", "level": 2, "question": "0x0A en décimal ?", "choices": ["1", "10", "11", "100"], "correct": 1, "explanation": "A = 10.", "duration": 8, "tags": ["conversion"] },
     { "id": "hex_020", "subject": "Hexadécimal", "level": 2, "question": "Pour représenter 1 octet en hexa, combien de chiffres ?", "choices": ["1", "2", "3", "4"], "correct": 1, "explanation": "8 bits = 2 chiffres hexa.", "duration": 8, "tags": ["représentation"] },
     { "id": "hex_021", "subject": "Hexadécimal", "level": 3, "question": "Hexa du masque réseau 255.255.255.0 (premier octet) ?", "choices": ["0xF0", "0xFF", "0xCC", "0xFE"], "correct": 1, "explanation": "255 = 0xFF.", "duration": 12, "tags": ["application"] },
-    { "id": "hex_022", "subject": "Hexadécimal", "level": 2, "question": "Couleur #0000FF est ?", "choices": ["Rouge", "Vert", "Bleu", "Cyan"], "correct": 2, "explanation": "Canal bleu au maximum.", "duration": 8, "tags": ["couleur"] }
+    { "id": "hex_022", "subject": "Hexadécimal", "level": 2, "question": "Couleur #0000FF est ?", "choices": ["Rouge", "Vert", "Bleu", "Cyan"], "correct": 2, "explanation": "Canal bleu au maximum.", "duration": 8, "tags": ["couleur"] },
+    { "id": "hex_023", "subject": "Hexadécimal", "level": 1, "question": "0x5 en décimal ?", "choices": ["3", "5", "10", "15"], "correct": 1, "explanation": "Identique entre 0 et 9.", "duration": 6, "tags": ["conversion"] },
+    { "id": "hex_024", "subject": "Hexadécimal", "level": 1, "question": "Quelle est la base de la notation hexadécimale ?", "choices": ["2", "8", "10", "16"], "correct": 3, "explanation": "Base 16.", "duration": 6, "tags": ["base"] },
+    { "id": "hex_025", "subject": "Hexadécimal", "level": 2, "question": "Couleur #FFFF00 est ?", "choices": ["Magenta", "Cyan", "Jaune", "Orange"], "correct": 2, "explanation": "R+G max → jaune.", "duration": 8, "tags": ["couleur"] },
+    { "id": "hex_026", "subject": "Hexadécimal", "level": 2, "question": "Hexa de 200 ?", "choices": ["0xC8", "0xCA", "0xCC", "0xC0"], "correct": 0, "explanation": "200 = 12×16 + 8 = 0xC8.", "duration": 10, "tags": ["conversion"] },
+    { "id": "hex_027", "subject": "Hexadécimal", "level": 3, "question": "0xABCD en décimal ?", "choices": ["43981", "44012", "43989", "43911"], "correct": 0, "explanation": "10·4096 + 11·256 + 12·16 + 13 = 43981.", "duration": 14, "tags": ["conversion"] },
+    { "id": "hex_028", "subject": "Hexadécimal", "level": 3, "question": "0xFF + 0x01 = ?", "choices": ["0x100", "0xFE", "0xFF", "0x00"], "correct": 0, "explanation": "255 + 1 = 256 = 0x100.", "duration": 12, "tags": ["addition"] },
+    { "id": "hex_029", "subject": "Hexadécimal", "level": 2, "question": "Hexa du nombre 32 ?", "choices": ["0x20", "0x22", "0x32", "0x2A"], "correct": 0, "explanation": "32 = 2×16 + 0 = 0x20.", "duration": 10, "tags": ["conversion"] },
+    { "id": "hex_030", "subject": "Hexadécimal", "level": 3, "question": "Couleur #00FFFF est ?", "choices": ["Magenta", "Cyan", "Vert", "Jaune"], "correct": 1, "explanation": "G+B max → cyan.", "duration": 12, "tags": ["couleur"] }
   ]
 }

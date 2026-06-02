@@ -2,7 +2,7 @@
   "id": "booleenne_v1",
   "subject": "Logique booléenne",
   "description": "Portes logiques, tables de vérité, lois de De Morgan, expressions booléennes.",
-  "version": "1.0",
+  "version": "1.1",
   "author": "NEUROLOCK",
   "questions": [
     { "id": "bool_001", "subject": "Logique booléenne", "level": 1, "question": "1 AND 0 = ?", "choices": ["0", "1", "indéterminé", "2"], "correct": 0, "explanation": "AND vaut 1 uniquement si les deux entrées sont 1.", "duration": 8, "tags": ["AND"] },
@@ -26,6 +26,14 @@
     { "id": "bool_019", "subject": "Logique booléenne", "level": 1, "question": "0 NAND 0 = ?", "choices": ["0", "1", "indéterminé", "2"], "correct": 1, "explanation": "NOT(0 AND 0) = NOT 0 = 1.", "duration": 8, "tags": ["NAND"] },
     { "id": "bool_020", "subject": "Logique booléenne", "level": 2, "question": "Quelle porte est universelle (peut tout construire) ?", "choices": ["AND", "OR", "NAND", "XOR"], "correct": 2, "explanation": "NAND (et NOR) sont universelles.", "duration": 10, "tags": ["théorie"] },
     { "id": "bool_021", "subject": "Logique booléenne", "level": 3, "question": "XOR de trois 1 (1⊕1⊕1) = ?", "choices": ["0", "1", "2", "3"], "correct": 1, "explanation": "1⊕1=0, 0⊕1=1.", "duration": 10, "tags": ["XOR"] },
-    { "id": "bool_022", "subject": "Logique booléenne", "level": 2, "question": "Une porte XNOR vaut 1 quand ?", "choices": ["A=B", "A≠B", "A=0", "A=1"], "correct": 0, "explanation": "XNOR = égalité.", "duration": 10, "tags": ["XNOR"] }
+    { "id": "bool_022", "subject": "Logique booléenne", "level": 2, "question": "Une porte XNOR vaut 1 quand ?", "choices": ["A=B", "A≠B", "A=0", "A=1"], "correct": 0, "explanation": "XNOR = égalité.", "duration": 10, "tags": ["XNOR"] },
+    { "id": "bool_023", "subject": "Logique booléenne", "level": 1, "question": "0 AND 0 = ?", "choices": ["0", "1", "indéterminé", "2"], "correct": 0, "explanation": "AND vaut 0 si une entrée est 0.", "duration": 6, "tags": ["AND"] },
+    { "id": "bool_024", "subject": "Logique booléenne", "level": 1, "question": "0 OR 0 = ?", "choices": ["0", "1", "indéterminé", "2"], "correct": 0, "explanation": "OR vaut 0 si les deux entrées sont 0.", "duration": 6, "tags": ["OR"] },
+    { "id": "bool_025", "subject": "Logique booléenne", "level": 2, "question": "Quelle est la sortie de A AND (B OR C) si A=1, B=0, C=1 ?", "choices": ["0", "1", "indéterminé", "C"], "correct": 1, "explanation": "B OR C = 1, puis 1 AND 1 = 1.", "duration": 10, "tags": ["évaluation"] },
+    { "id": "bool_026", "subject": "Logique booléenne", "level": 2, "question": "Combien de portes NOT pour inverser 3 entrées ?", "choices": ["1", "2", "3", "6"], "correct": 2, "explanation": "Une porte NOT par signal à inverser.", "duration": 8, "tags": ["portes"] },
+    { "id": "bool_027", "subject": "Logique booléenne", "level": 3, "question": "Forme distributive : A AND (B OR C) = ?", "choices": ["(A AND B) OR (A AND C)", "A OR (B AND C)", "(A OR B) AND (A OR C)", "A AND B AND C"], "correct": 0, "explanation": "Distributivité de AND sur OR.", "duration": 12, "tags": ["distributivité"] },
+    { "id": "bool_028", "subject": "Logique booléenne", "level": 3, "question": "Combien de portes NAND minimales pour réaliser un NOT ?", "choices": ["1", "2", "3", "4"], "correct": 0, "explanation": "NAND avec entrées reliées = NOT.", "duration": 12, "tags": ["NAND"] },
+    { "id": "bool_029", "subject": "Logique booléenne", "level": 2, "question": "A XOR 1 = ?", "choices": ["0", "1", "A", "NOT A"], "correct": 3, "explanation": "XOR avec 1 inverse l'entrée.", "duration": 10, "tags": ["XOR"] },
+    { "id": "bool_030", "subject": "Logique booléenne", "level": 3, "question": "(A AND B) OR (NOT A AND B) se simplifie en ?", "choices": ["A", "B", "A AND B", "A OR B"], "correct": 1, "explanation": "Factorisation par B : (A OR NOT A) AND B = B.", "duration": 14, "tags": ["simplification"] }
   ]
 }
